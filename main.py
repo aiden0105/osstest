@@ -10,12 +10,11 @@ MINE_COUNT = 40    # 지뢰 총 개수 (default, HARD 기준)
 
 # 게임 점수와 타이머를 구성하는 클래스
 class Score:
-    def __init__(self, font, screen, initial_score=0, difficulty='Hard'):
+    def __init__(self, font, screen, initial_score=0):
         self.score = initial_score
         self.start_time = time.time()
         self.font = font
         self.screen = screen
-        self.difficulty = difficulty
         self.opened_cells = 0
 
     def update_score_for_open_cell(self):
@@ -24,18 +23,15 @@ class Score:
 
     def apply_game_over_penalty(self):
         self.score -= 20
-
+    
+    # 난이도 별 클리어시 추가점수 차등적용
     def apply_victory_bonus(self, difficulty):
-        if difficulty == 'easy':
-            self.score += 50
-        elif difficulty == 'medium':
-            self.score += 100
-        elif difficulty == 'hard':
-            self.score += 200
+        bonus = {'easy': 50, 'medium': 100, 'hard': 200}
+        self.score += bonus.get(difficulty, 0)
 
     def display_score(self):
         elapsed_time = int(time.time() - self.start_time)
-        score_time_text = f'{self.difficulty} - Score: {self.score} | Time: {elapsed_time} sec'
+        score_time_text = f'Score: {self.score} | Time: {elapsed_time} sec'
         display_text = self.font.render(score_time_text, True, (0, 0, 255))
         text_x = (self.screen.get_width() - display_text.get_width()) / 2
         self.screen.blit(display_text, (text_x, 10))
@@ -44,12 +40,15 @@ class Score:
         self.start_time = time.time()
         self.score = 0
         self.opened_cells = 0
-
+        
+    # 최종 점수와 걸린 시간 표시하는 함수
+    def final_message(self):
+        elapsed_time = self.get_elapsed_time()
+        return f"Final Score: {self.score}, Time Taken: {elapsed_time} sec"
+        
+    # 최종 걸린 시간 표시하는 함수
     def get_elapsed_time(self):
         return int(time.time() - self.start_time)
-
-    def final_message(self):
-        return f"Final Score: {self.score}, Time Taken: {self.get_elapsed_time()} sec"
 
 
 # 지뢰찾기 보드판을 구성하는 클래스        
@@ -174,7 +173,7 @@ class Minesweeper:
                     if self.flags[x][y]:
                         pygame.draw.circle(self.screen, (0, 0, 255), (rect.centerx, rect.centery), 10)
                         
-        self.scoreboard.display_score()  # 현재 점수, 타이머 실시간 표시
+        self.scoreboard.display_score()
         
         if self.game_over:
             message = self.font.render("Game Over! " + self.scoreboard.final_message(), True, (255, 0, 0))

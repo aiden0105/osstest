@@ -37,8 +37,9 @@ class Minesweeper:
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 36)
         self.choose_difficulty()
+        self.scoreboard = Score(self.font, self.screen)  # 스코어보드 초기화
         self.reset()
-        self.scoreboard = Score(self.font, self.screen)  # 스코어보드 표시
+
 
     # 난이도 설정 (easy, medium, hard)
     def choose_difficulty(self):

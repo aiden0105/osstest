@@ -10,21 +10,21 @@ MINE_COUNT = 40    # 지뢰 총 개수 (default, HARD 기준)
 
 # 게임 점수와 타이머를 구성하는 클래스
 class Score:
-    def __init__(self, font, screen, initial_score=0):
+    def __init__(self, font, screen, initial_score=0, difficulty='Hard'):
         self.score = initial_score
         self.start_time = time.time()
         self.font = font
         self.screen = screen
+        self.difficulty = difficulty
         self.opened_cells = 0
 
     def update_score_for_open_cell(self):
         self.opened_cells += 1
-        self.score += 3  # 한 칸을 열 때마다 +3점
+        self.score += 3
 
     def apply_game_over_penalty(self):
-        self.score -= 20  # 게임에서 패배시 -20점
+        self.score -= 20
 
-    # 난이도 별 클리어시 추가점수 차등적용
     def apply_victory_bonus(self, difficulty):
         if difficulty == 'easy':
             self.score += 50
@@ -35,7 +35,7 @@ class Score:
 
     def display_score(self):
         elapsed_time = int(time.time() - self.start_time)
-        score_time_text = f'Score: {self.score} | Time: {elapsed_time} sec'
+        score_time_text = f'{self.difficulty} - Score: {self.score} | Time: {elapsed_time} sec'
         display_text = self.font.render(score_time_text, True, (0, 0, 255))
         text_x = (self.screen.get_width() - display_text.get_width()) / 2
         self.screen.blit(display_text, (text_x, 10))
@@ -45,11 +45,9 @@ class Score:
         self.score = 0
         self.opened_cells = 0
 
-    # 최종 걸린 시간 표시하는 함수
     def get_elapsed_time(self):
         return int(time.time() - self.start_time)
-    
-    # 최종 점수와 걸린 시간 표시하는 함수
+
     def final_message(self):
         return f"Final Score: {self.score}, Time Taken: {self.get_elapsed_time()} sec"
 

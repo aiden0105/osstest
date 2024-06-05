@@ -10,12 +10,11 @@ MINE_COUNT = 40    # 지뢰 총 개수 (default, HARD 기준)
 
 # 게임 점수와 타이머를 구성하는 클래스
 class Score:
-    def __init__(self, font, screen, initial_score=0, difficulty='Hard'):
+    def __init__(self, font, screen, initial_score=0):
         self.score = initial_score
         self.start_time = time.time()
         self.font = font
         self.screen = screen
-        self.difficulty = difficulty
         self.opened_cells = 0
 
     def update_score_for_open_cell(self):
@@ -34,16 +33,13 @@ class Score:
         elif difficulty == 'hard':
             self.score += 200
 
-    # 실시간으로 점수, 타이머, 난이도를 표시하는 함수
-    class Score:
-        def display_score(self, difficulty):
-            elapsed_time = int(time.time() - self.start_time)
-            score_time_text = f'{difficulty} - Score: {self.score} | Time: {elapsed_time} sec'
-            display_text = self.font.render(score_time_text, True, (0, 0, 255))
-            text_x = (self.screen.get_width() - display_text.get_width()) / 2
-            self.screen.blit(display_text, (text_x, 10))
+    def display_score(self):
+        elapsed_time = int(time.time() - self.start_time)
+        score_time_text = f'Score: {self.score} | Time: {elapsed_time} sec'
+        display_text = self.font.render(score_time_text, True, (0, 0, 255))
+        text_x = (self.screen.get_width() - display_text.get_width()) / 2
+        self.screen.blit(display_text, (text_x, 10))
 
-    # 게임 패배시 타이머와 점수 리셋
     def reset(self):
         self.start_time = time.time()
         self.score = 0
@@ -67,8 +63,9 @@ class Minesweeper:
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 24)
         self.choose_difficulty()
-        self.scoreboard = Score(self.font, self.screen, difficulty=self.current_difficulty)  # 스코어보드 초기화
+        self.scoreboard = Score(self.font, self.screen)  # 스코어보드 초기화
         self.reset()
+
 
     # 난이도 설정 (easy, medium, hard)
     def choose_difficulty(self):
@@ -79,22 +76,17 @@ class Minesweeper:
             self.mine_count = 10
             self.screen_width = 400
             self.screen_height = 400
-            self.current_difficulty = 'Easy'
         elif choice == '2':
             self.grid_size = 10
             self.mine_count = 15
             self.screen_width = 500
             self.screen_height = 500
-            self.current_difficulty = 'Medium'
         else:
             self.grid_size = 20
             self.mine_count = 40
             self.screen_width = 800
             self.screen_height = 600
-            self.current_difficulty = 'Hard'
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-        if hasattr(self, 'scoreboard'):
-            self.scoreboard.difficulty = self.current_difficulty
 
     # 모든 게임 필드 초기화
     def reset(self):
@@ -173,26 +165,25 @@ class Minesweeper:
                                    self.screen_width // self.grid_size, self.screen_height // self.grid_size)
                 if self.grid[x][y] == 1:
                     if self.mines[x][y]:
-                        pygame.draw.rect(self.screen, (255, 0, 0), rect)  # Mines are displayed in red
+                        pygame.draw.rect(self.screen, (255, 0, 0), rect)
                     else:
-                        pygame.draw.rect(self.screen, (255, 255, 255), rect)  # Safe squares are white
+                        pygame.draw.rect(self.screen, (255, 255, 255), rect)
                         if self.adjacent[x][y] > 0:
                             label = self.font.render(str(self.adjacent[x][y]), True, (0, 0, 0))
-                            self.screen.blit(label, rect.topleft)  # Display number of adjacent mines
+                            self.screen.blit(label, rect.topleft)
                 else:
-                    pygame.draw.rect(self.screen, (160, 160, 160), rect)  # Unopened squares are gray
+                    pygame.draw.rect(self.screen, (160, 160, 160), rect)
                     if self.flags[x][y]:
-                        pygame.draw.circle(self.screen, (0, 0, 255), (rect.centerx, rect.centery), 10)  # Flags are blue circles
-    
-        self.scoreboard.display_score()  # Display score and time
+                        pygame.draw.circle(self.screen, (0, 0, 255), (rect.centerx, rect.centery), 10)
+                        
+        self.scoreboard.display_score()  # 현재 점수, 타이머 실시간 표시
+        
         if self.game_over:
             message = self.font.render("Game Over! " + self.scoreboard.final_message(), True, (255, 0, 0))
             self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
         if self.victory:
             message = self.font.render("You Won! " + self.scoreboard.final_message(), True, (0, 255, 0))
             self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
-
-
 
     # 게임 실행 함수
     def run(self):

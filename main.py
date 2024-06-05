@@ -8,11 +8,12 @@ SCREEN_HEIGHT = 600
 GRID_SIZE = 20
 MINE_COUNT = 40    # 지뢰 총 개수
 
+# 게임 점수와 타이머를 구성하는 클래스
 class Score:
     def __init__(self, font, screen, initial_score=0):
         self.score = initial_score
         self.start_time = time.time()
-        self.font = font
+        self.font = pygame.font.Font(None, 18)  # Using a smaller font size as previously adjusted
         self.screen = screen
 
     def update_score(self, points):
@@ -20,15 +21,18 @@ class Score:
 
     def display_score(self):
         elapsed_time = int(time.time() - self.start_time)
-        score_text = self.font.render(f'Score: {self.score}', True, (255, 255, 255))
-        time_text = self.font.render(f'Time: {elapsed_time} sec', True, (255, 255, 255))
-        self.screen.blit(score_text, (self.screen.get_width() - 200, 10))
-        self.screen.blit(time_text, (self.screen.get_width() - 200, 50))
+        # Combine score and time into one line and change text color to blue
+        score_time_text = f'Score: {self.score} | Time: {elapsed_time} sec'
+        display_text = self.font.render(score_time_text, True, (0, 0, 255))
+        # Position the text to the top center of the screen
+        text_x = (self.screen.get_width() - display_text.get_width()) / 2
+        self.screen.blit(display_text, (text_x, 10))
 
     def reset(self):
         self.start_time = time.time()
         self.score = 0
-        
+
+# 지뢰찾기 보드판을 구성하는 클래스        
 class Minesweeper:
     def __init__(self):
         pygame.init()
@@ -150,11 +154,11 @@ class Minesweeper:
         self.scoreboard.display_score()
     
         if self.game_over:
-            message = self.font.render("Game Over! You hit a mine. " + f"Final Score: {self.scoreboard.score}", True, (255, 0, 0))
+            message = self.font.render("Game Over! You hit a mine. " + f"\nFinal Score: {self.scoreboard.score}", True, (255, 0, 0))
             self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
     
         if self.victory:
-            message = self.font.render("You Won! All safe squares revealed. " + f"Final Score: {self.scoreboard.score}", True, (0, 255, 0))
+            message = self.font.render("You Won! All safe squares revealed. " + f"\nFinal Score: {self.scoreboard.score}", True, (0, 255, 0))
             self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
 
 

@@ -13,25 +13,47 @@ class Minesweeper:
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Minesweeper")
         self.clock = pygame.time.Clock()
-        self.font = pygame.font.Font(None, 36)  # 폰트 설정 추가
+        self.font = pygame.font.Font(None, 36)
+        self.choose_difficulty()
         self.reset()
+
+    # 난이도 설정 (easy, medium, hard)
+    def choose_difficulty(self):
+        print("Choose difficulty: Easy (1), Medium (2), Hard (3)")
+        choice = input("Enter your choice (1, 2, or 3): ")
+        if choice == '1':
+            self.grid_size = 8
+            self.mine_count = 10
+            self.screen_width = 400
+            self.screen_height = 400
+        elif choice == '2':
+            self.grid_size = 10
+            self.mine_count = 15
+            self.screen_width = 500
+            self.screen_height = 500
+        else:  # Default to hard if no or invalid input
+            self.grid_size = 20
+            self.mine_count = 40
+            self.screen_width = 800
+            self.screen_height = 600
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
 
     # 모든 게임 필드 초기화
     def reset(self):
-        self.mines = [[False] * GRID_SIZE for _ in range(GRID_SIZE)]
-        self.adjacent = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
-        self.flags = [[False] * GRID_SIZE for _ in range(GRID_SIZE)]
-        self.grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
+        self.mines = [[False] * self.grid_size for _ in range(self.grid_size)]
+        self.adjacent = [[0] * self.grid_size for _ in range(self.grid_size)]
+        self.flags = [[False] * self.grid_size for _ in range(self.grid_size)]
+        self.grid = [[0] * self.grid_size for _ in range(self.grid_size)]
         self.game_over = False
         self.victory = False
-        self.place_mines()  # 새 게임에 대한 지뢰를 재배치
+        self.place_mines()
                         
     # 지뢰를 게임 보드에 무작위로 배치하는 함수
     def place_mines(self):
         placed = 0
-        while placed < MINE_COUNT:
-            x = random.randint(0, GRID_SIZE - 1)
-            y = random.randint(0, GRID_SIZE - 1)
+        while placed < self.mine_count:
+            x = random.randint(0, self.grid_size - 1)
+            y = random.randint(0, self.grid_size - 1)
             if not self.mines[x][y]:
                 self.mines[x][y] = True
                 self.increment_adjacent(x, y)  # 인접 칸 지뢰 수 증가
@@ -47,11 +69,12 @@ class Minesweeper:
                     
     # 마우스 입력 처리 함수
     def handle_mouse_input(self, event):
-        x, y = event.pos[0] // (SCREEN_WIDTH // GRID_SIZE), event.pos[1] // (SCREEN_HEIGHT // GRID_SIZE)
+        x, y = event.pos[0] // (self.screen_width // self.grid_size), event.pos[1] // (self.screen_height // self.grid_size)
         if event.button == 1 and not self.flags[x][y]:  # 왼쪽 클릭 처리
             self.open_cell(x, y)
         elif event.button == 3 and not self.grid[x][y]:  # 오른쪽 클릭 처리
             self.toggle_flag(x, y)
+
 
     # 지정된 위치의 칸을 여는 함수
     def open_cell(self, x, y):
@@ -76,10 +99,10 @@ class Minesweeper:
 
     # 게임 보드 그리기 함수
     def draw_board(self):
-        for x in range(GRID_SIZE):
-            for y in range(GRID_SIZE):
-                rect = pygame.Rect(x * (SCREEN_WIDTH // GRID_SIZE), y * (SCREEN_HEIGHT // GRID_SIZE),
-                                   SCREEN_WIDTH // GRID_SIZE, SCREEN_HEIGHT // GRID_SIZE)
+        for x in range(self.grid_size):
+            for y in range(self.grid_size):
+                rect = pygame.Rect(x * (self.screen_width // self.grid_size), y * (self.screen_height // self.grid_size),
+                                   self.screen_width // self.grid_size, self.screen_height // self.grid_size)
                 if self.grid[x][y] == 1:
                     if self.mines[x][y]:
                         pygame.draw.rect(self.screen, (255, 0, 0), rect)  # 지뢰가 있는 칸은 빨간색으로 표시

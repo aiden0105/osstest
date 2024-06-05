@@ -79,7 +79,7 @@ class Minesweeper:
         choice = input("Enter your choice (1, 2, 3): ")
         if choice == '1':
             self.grid_size = 8
-            self.mine_count = 10
+            self.mine_count = 3
             self.screen_width = 400
             self.screen_height = 400
         elif choice == '2':

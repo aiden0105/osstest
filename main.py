@@ -10,6 +10,7 @@ MINE_COUNT = 40    # 지뢰 총 개수 (default, HARD 기준)
 
 # 게임 점수와 타이머를 구성하는 클래스
 class Score:
+    # 스코어 클래스 초기화, 점수와 타이머 시작 시간 설정
     def __init__(self, font, screen, initial_score=0):
         self.score = initial_score
         self.start_time = time.time()
@@ -17,18 +18,25 @@ class Score:
         self.screen = screen
         self.opened_cells = 0
 
+    # 칸을 열 때마다 점수 증가
     def update_score_for_open_cell(self):
         self.opened_cells += 1
         self.score += 3
 
+    # 깃발 우클릭시 점수 업데이트
+    def update_score_for_flag(self, flag_set):
+        self.score -= 1 if flag_set else 1
+
+    # 게임 오버시 점수 감소
     def apply_game_over_penalty(self):
         self.score -= 20
     
-    # 난이도 별 클리어시 추가점수 차등적용
+    # 난이도 별 클리어시 보너스 점수 차등적용
     def apply_victory_bonus(self, difficulty):
         bonus = {'easy': 50, 'medium': 100, 'hard': 200}
         self.score += bonus.get(difficulty, 0)
 
+    # 화면에 현재 점수와 경과 시간 표시
     def display_score(self):
         elapsed_time = int(time.time() - self.start_time)
         score_time_text = f'Score: {self.score} | Time: {elapsed_time} sec'
@@ -36,23 +44,25 @@ class Score:
         text_x = (self.screen.get_width() - display_text.get_width()) / 2
         self.screen.blit(display_text, (text_x, 10))
 
+    # 게임 리셋시 점수와 타이머 초기화
     def reset(self):
         self.start_time = time.time()
         self.score = 0
         self.opened_cells = 0
         
-    # 최종 점수와 걸린 시간 표시하는 함수
+    # 게임 종료시 최종 점수와 소요 시간 메시지 생성
     def final_message(self):
         elapsed_time = self.get_elapsed_time()
         return f"Final Score: {self.score}, Time Taken: {elapsed_time} sec"
         
-    # 최종 걸린 시간 표시하는 함수
+    # 경과 시간 계산
     def get_elapsed_time(self):
         return int(time.time() - self.start_time)
 
 
 # 지뢰찾기 보드판을 구성하는 클래스        
 class Minesweeper:
+    # 게임 초기화, 화면 설정 및 게임 타이머 시작
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -63,8 +73,7 @@ class Minesweeper:
         self.scoreboard = Score(self.font, self.screen)  # 스코어보드 초기화
         self.reset()
 
-
-    # 난이도 설정 (easy, medium, hard)
+    # 난이도 선택 (easy, medium, hard)
     def choose_difficulty(self):
         print("Choose difficulty: Easy (1), Medium (2), Hard (3)")
         choice = input("Enter your choice (1, 2, 3): ")
@@ -151,7 +160,7 @@ class Minesweeper:
     def toggle_flag(self, x, y):
         if not self.grid[x][y]:
             self.flags[x][y] = not self.flags[x][y]
-            self.scoreboard.update_score(-1 if self.flags[x][y] else 1)  # 우클릭 사용시 -1점
+            self.scoreboard.update_score_for_flag(self.flags[x][y])  # 우클릭 사용시 점수 업데이트
 
 
     # 게임 보드 그리기 함수
@@ -173,7 +182,7 @@ class Minesweeper:
                     if self.flags[x][y]:
                         pygame.draw.circle(self.screen, (0, 0, 255), (rect.centerx, rect.centery), 10)
                         
-        self.scoreboard.display_score()
+        self.scoreboard.display_score()  # 실시간 점수 & 타이머 표시
         
         if self.game_over:
             message = self.font.render("Game Over! " + self.scoreboard.final_message(), True, (255, 0, 0))

@@ -173,25 +173,25 @@ class Minesweeper:
                                    self.screen_width // self.grid_size, self.screen_height // self.grid_size)
                 if self.grid[x][y] == 1:
                     if self.mines[x][y]:
-                        pygame.draw.rect(self.screen, (255, 0, 0), rect)  # 지뢰가 있는 칸은 빨간색으로 표시
+                        pygame.draw.rect(self.screen, (255, 0, 0), rect)  # Mines are displayed in red
                     else:
-                        pygame.draw.rect(self.screen, (255, 255, 255), rect)  # 안전한 칸은 흰색으로 표시
+                        pygame.draw.rect(self.screen, (255, 255, 255), rect)  # Safe squares are white
                         if self.adjacent[x][y] > 0:
                             label = self.font.render(str(self.adjacent[x][y]), True, (0, 0, 0))
-                            self.screen.blit(label, rect.topleft)  # 인접 지뢰 수를 표시
+                            self.screen.blit(label, rect.topleft)  # Display number of adjacent mines
                 else:
-                    pygame.draw.rect(self.screen, (160, 160, 160), rect)  # 닫힌 칸은 회색으로 표시
+                    pygame.draw.rect(self.screen, (160, 160, 160), rect)  # Unopened squares are gray
                     if self.flags[x][y]:
-                        pygame.draw.circle(self.screen, (0, 0, 255), (rect.centerx, rect.centery), 10)  # 깃발이 있는 칸에는 파란색 원을 표시
+                        pygame.draw.circle(self.screen, (0, 0, 255), (rect.centerx, rect.centery), 10)  # Flags are blue circles
     
-        self.scoreboard.display_score(self.current_difficulty)  # 현재 스코어, 시간, 난이도 실시간 표시
-        
+        self.scoreboard.display_score()  # Display score and time
         if self.game_over:
             message = self.font.render("Game Over! " + self.scoreboard.final_message(), True, (255, 0, 0))
             self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
         if self.victory:
             message = self.font.render("You Won! " + self.scoreboard.final_message(), True, (0, 255, 0))
             self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
+
 
 
     # 게임 실행 함수

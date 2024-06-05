@@ -105,6 +105,14 @@ class Minesweeper:
         self.place_mines()
         self.scoreboard.reset()
 
+    # 게임 승리 조건을 확인하는 함수
+    def check_victory(self):
+        for x in range(self.grid_size):
+            for y in range(self.grid_size):
+                if (self.mines[x][y] and not self.flags[x][y]) or (not self.mines[x][y] and not self.grid[x][y]):
+                    return False
+        self.victory = True
+        return True
                         
     # 지뢰를 게임 보드에 무작위로 배치하는 함수
     def place_mines(self):
@@ -146,6 +154,7 @@ class Minesweeper:
                 self.scoreboard.update_score_for_open_cell()
                 if self.adjacent[x][y] == 0:
                     self.open_adjacent_cells(x, y)  # 인접한 칸 자동으로 열기
+                self.check_victory()  # 승리 조건 확인
 
     # 지정된 위치의 인접 칸을 자동으로 여는 함수
     def open_adjacent_cells(self, x, y):
@@ -161,7 +170,7 @@ class Minesweeper:
         if not self.grid[x][y]:
             self.flags[x][y] = not self.flags[x][y]
             self.scoreboard.update_score_for_flag(self.flags[x][y])  # 우클릭 사용시 점수 업데이트
-
+            self.check_victory()  # 승리 조건 확인
 
     # 게임 보드 그리기 함수
     def draw_board(self):

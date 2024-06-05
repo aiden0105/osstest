@@ -79,19 +79,22 @@ class Minesweeper:
         choice = input("Enter your choice (1, 2, 3): ")
         if choice == '1':
             self.grid_size = 8
-            self.mine_count = 3
+            self.mine_count = 10
             self.screen_width = 400
             self.screen_height = 400
+            self.current_difficulty = 'easy'
         elif choice == '2':
             self.grid_size = 10
             self.mine_count = 15
             self.screen_width = 500
             self.screen_height = 500
+            self.current_difficulty = 'medium'
         else:
             self.grid_size = 20
             self.mine_count = 40
             self.screen_width = 800
             self.screen_height = 600
+            self.current_difficulty = 'hard'
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
 
     # 모든 게임 필드 초기화
@@ -112,6 +115,7 @@ class Minesweeper:
                 if (self.mines[x][y] and not self.flags[x][y]) or (not self.mines[x][y] and not self.grid[x][y]):
                     return False
         self.victory = True
+        self.scoreboard.apply_victory_bonus(self.current_difficulty)  # 승리시 난이도별 보너스 점수 적용
         return True
                         
     # 지뢰를 게임 보드에 무작위로 배치하는 함수

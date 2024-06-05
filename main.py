@@ -33,13 +33,16 @@ class Score:
         elif difficulty == 'hard':
             self.score += 200
 
-    def display_score(self):
+    # 실시간으로 점수, 타이머, 난이도를 표시하는 함수
+    def display_score(self, difficulty):
         elapsed_time = int(time.time() - self.start_time)
-        score_time_text = f'Score: {self.score} | Time: {elapsed_time} sec'
+        difficulty_prefix = difficulty.capitalize() + " - "  # Capitalize the first letter
+        score_time_text = f'{difficulty_prefix}Score: {self.score} | Time: {elapsed_time} sec'
         display_text = self.font.render(score_time_text, True, (0, 0, 255))
         text_x = (self.screen.get_width() - display_text.get_width()) / 2
         self.screen.blit(display_text, (text_x, 10))
 
+    # 게임 패배시 타이머와 점수 리셋
     def reset(self):
         self.start_time = time.time()
         self.score = 0
@@ -87,6 +90,7 @@ class Minesweeper:
             self.screen_width = 800
             self.screen_height = 600
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        self.current_difficulty = 'easy' if choice == '1' else 'medium' if choice == '2' else 'hard'
 
     # 모든 게임 필드 초기화
     def reset(self):
@@ -176,7 +180,7 @@ class Minesweeper:
                     if self.flags[x][y]:
                         pygame.draw.circle(self.screen, (0, 0, 255), (rect.centerx, rect.centery), 10)
     
-        self.scoreboard.display_score()  # 현재 스코어, 시간 실시간 표시
+        self.scoreboard.display_score(self.current_difficulty)  # 현재 스코어, 시간, 난이도 실시간 표시
         if self.game_over:
             message = self.font.render("Game Over! " + self.scoreboard.final_message(), True, (255, 0, 0))
             self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))

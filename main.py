@@ -103,31 +103,31 @@ class Minesweeper:
 
     # 게임 실행 함수
     def run(self):
-    while True:  # 게임을 계속 반복 실행할 수 있도록 무한 루프로 변경
-        while not self.game_over and not self.victory:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    self.handle_mouse_input(event)
-            self.screen.fill((0, 0, 0))
-            self.draw_board()
-            pygame.display.flip()
-            self.clock.tick(30)
-
-        if self.game_over:
-            message = self.font.render("Game Over! You hit a mine.", True, (255, 0, 0))
-            self.screen.blit(message, (SCREEN_WIDTH / 2 - message.get_width() / 2, SCREEN_HEIGHT / 2))
-            pygame.display.flip()
-            pygame.time.wait(1000)  # 패배 후 1초 대기
-        elif self.victory:
-            message = self.font.render("You Won! All safe squares revealed.", True, (0, 255, 0))
-            self.screen.blit(message, (SCREEN_WIDTH / 2 - message.get_width() / 2, SCREEN_HEIGHT / 2))
-            pygame.display.flip()
-            pygame.time.wait(5000)  # 승리 메시지 5초간 표시
-
-        self.reset()  # 게임 상태를 초기화하여 새 게임 시작
+        while True:  # 게임을 계속 반복 실행할 수 있도록 무한 루프로 변경
+            while not self.game_over and not self.victory:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        return
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        self.handle_mouse_input(event)
+                self.screen.fill((0, 0, 0))
+                self.draw_board()
+                pygame.display.flip()
+                self.clock.tick(30)
+    
+            if self.game_over:
+                message = self.font.render("Game Over! You hit a mine.", True, (255, 0, 0))
+                self.screen.blit(message, (SCREEN_WIDTH / 2 - message.get_width() / 2, SCREEN_HEIGHT / 2))
+                pygame.display.flip()
+                pygame.time.wait(1000)  # 패배 후 1초 대기
+            elif self.victory:
+                message = self.font.render("You Won! All safe squares revealed.", True, (0, 255, 0))
+                self.screen.blit(message, (SCREEN_WIDTH / 2 - message.get_width() / 2, SCREEN_HEIGHT / 2))
+                pygame.display.flip()
+                pygame.time.wait(5000)  # 승리 메시지 5초간 표시
+    
+            self.reset()  # 게임 상태를 초기화하여 새 게임 시작
 
 
 

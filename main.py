@@ -6,7 +6,7 @@ import time
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 GRID_SIZE = 20
-MINE_COUNT = 40    # 지뢰 총 개수
+MINE_COUNT = 40    # 지뢰 총 개수 (default, HARD 기준)
 
 # 게임 점수와 타이머를 구성하는 클래스
 class Score:
@@ -19,13 +19,13 @@ class Score:
 
     def update_score_for_open_cell(self):
         self.opened_cells += 1
-        self.score += 3  # Add 3 points for each opened cell
+        self.score += 3  # 한 칸을 열 때마다 +3점
 
     def apply_game_over_penalty(self):
-        self.score -= 20  # Subtract 20 points for losing the game
+        self.score -= 20  # 게임에서 패배시 -20점
 
+    # 난이도 별 클리어시 추가점수 차등적용
     def apply_victory_bonus(self, difficulty):
-        # Apply bonus based on difficulty level
         if difficulty == 'easy':
             self.score += 50
         elif difficulty == 'medium':
@@ -176,10 +176,10 @@ class Minesweeper:
                     if self.flags[x][y]:
                         pygame.draw.circle(self.screen, (0, 0, 255), (rect.centerx, rect.centery), 10)
     
+        self.scoreboard.display_score()  # 현재 스코어, 시간 실시간 표시
         if self.game_over:
             message = self.font.render("Game Over! " + self.scoreboard.final_message(), True, (255, 0, 0))
             self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
-    
         if self.victory:
             message = self.font.render("You Won! " + self.scoreboard.final_message(), True, (0, 255, 0))
             self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
@@ -206,7 +206,6 @@ class Minesweeper:
                     self.scoreboard.apply_victory_bonus(self.current_difficulty)  # 승리시 난이도별 보너스 점수 적용
                     pygame.time.wait(5000)  # 승리시 5초 대기
                     break
-    
             self.reset()  # 게임판 리셋
 
 if __name__ == "__main__":

@@ -92,8 +92,9 @@ class Minesweeper:
         for dx in [-1, 0, 1]:
             for dy in [-1, 0, 1]:
                 nx, ny = x + dx, y + dy
-                if 0 <= nx < GRID_SIZE and 0 <= ny < GRID_SIZE and not self.grid[nx][ny]:
+                if 0 <= nx < self.grid_size and 0 <= ny < self.grid_size and not self.grid[nx][ny]:
                     self.open_cell(nx, ny)
+
 
     # 깃발 상태를 토글하는 함수
     def toggle_flag(self, x, y):

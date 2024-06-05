@@ -131,15 +131,15 @@ class Minesweeper:
 
     # 지정된 위치의 칸을 여는 함수
     def open_cell(self, x, y):
-    if not self.grid[x][y]:
-        self.grid[x][y] = 1
-        if self.mines[x][y]:
-            self.game_over = True
-            self.scoreboard.apply_game_over_penalty()
-        else:
-            self.scoreboard.update_score_for_open_cell()
-            if self.adjacent[x][y] == 0:
-                self.open_adjacent_cells(x, y)  # 인접한 칸 자동으로 열기
+        if not self.grid[x][y]:
+            self.grid[x][y] = 1
+            if self.mines[x][y]:
+                self.game_over = True
+                self.scoreboard.apply_game_over_penalty()
+            else:
+                self.scoreboard.update_score_for_open_cell()
+                if self.adjacent[x][y] == 0:
+                    self.open_adjacent_cells(x, y)  # 인접한 칸 자동으로 열기
 
     # 지정된 위치의 인접 칸을 자동으로 여는 함수
     def open_adjacent_cells(self, x, y):

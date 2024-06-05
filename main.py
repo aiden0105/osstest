@@ -10,11 +10,12 @@ MINE_COUNT = 40    # 지뢰 총 개수 (default, HARD 기준)
 
 # 게임 점수와 타이머를 구성하는 클래스
 class Score:
-    def __init__(self, font, screen, initial_score=0):
+    def __init__(self, font, screen, initial_score=0, difficulty='Hard'):
         self.score = initial_score
         self.start_time = time.time()
         self.font = font
         self.screen = screen
+        self.difficulty = difficulty
         self.opened_cells = 0
 
     def update_score_for_open_cell(self):
@@ -34,13 +35,13 @@ class Score:
             self.score += 200
 
     # 실시간으로 점수, 타이머, 난이도를 표시하는 함수
-    def display_score(self, difficulty):
+    def display_score(self):
         elapsed_time = int(time.time() - self.start_time)
-        difficulty_prefix = difficulty.capitalize() + " - "  # Capitalize the first letter
-        score_time_text = f'{difficulty_prefix}Score: {self.score} | Time: {elapsed_time} sec'
+        score_time_text = f'{self.difficulty} - Score: {self.score} | Time: {elapsed_time} sec'
         display_text = self.font.render(score_time_text, True, (0, 0, 255))
         text_x = (self.screen.get_width() - display_text.get_width()) / 2
         self.screen.blit(display_text, (text_x, 10))
+
 
     # 게임 패배시 타이머와 점수 리셋
     def reset(self):
@@ -66,9 +67,8 @@ class Minesweeper:
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 24)
         self.choose_difficulty()
-        self.scoreboard = Score(self.font, self.screen)  # 스코어보드 초기화
+        self.scoreboard = Score(self.font, self.screen, difficulty=self.current_difficulty)  # 스코어보드 초기화
         self.reset()
-
 
     # 난이도 설정 (easy, medium, hard)
     def choose_difficulty(self):
@@ -79,18 +79,22 @@ class Minesweeper:
             self.mine_count = 10
             self.screen_width = 400
             self.screen_height = 400
+            self.current_difficulty = 'Easy'
         elif choice == '2':
             self.grid_size = 10
             self.mine_count = 15
             self.screen_width = 500
             self.screen_height = 500
+            self.current_difficulty = 'Medium'
         else:
             self.grid_size = 20
             self.mine_count = 40
             self.screen_width = 800
             self.screen_height = 600
+            self.current_difficulty = 'Hard'
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-        self.current_difficulty = 'easy' if choice == '1' else 'medium' if choice == '2' else 'hard'
+        if hasattr(self, 'scoreboard'):
+            self.scoreboard.difficulty = self.current_difficulty
 
     # 모든 게임 필드 초기화
     def reset(self):

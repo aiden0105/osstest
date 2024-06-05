@@ -13,24 +13,46 @@ class Score:
     def __init__(self, font, screen, initial_score=0):
         self.score = initial_score
         self.start_time = time.time()
-        self.font = pygame.font.Font(None, 18)  # Using a smaller font size as previously adjusted
+        self.font = font
         self.screen = screen
+        self.opened_cells = 0
 
-    def update_score(self, points):
-        self.score += points
+    def update_score_for_open_cell(self):
+        self.opened_cells += 1
+        self.score += 3  # Add 3 points for each opened cell
+
+    def apply_game_over_penalty(self):
+        self.score -= 20  # Subtract 20 points for losing the game
+
+    def apply_victory_bonus(self, difficulty):
+        # Apply bonus based on difficulty level
+        if difficulty == 'easy':
+            self.score += 50
+        elif difficulty == 'medium':
+            self.score += 100
+        elif difficulty == 'hard':
+            self.score += 200
 
     def display_score(self):
         elapsed_time = int(time.time() - self.start_time)
-        # Combine score and time into one line and change text color to blue
         score_time_text = f'Score: {self.score} | Time: {elapsed_time} sec'
         display_text = self.font.render(score_time_text, True, (0, 0, 255))
-        # Position the text to the top center of the screen
         text_x = (self.screen.get_width() - display_text.get_width()) / 2
         self.screen.blit(display_text, (text_x, 10))
 
     def reset(self):
         self.start_time = time.time()
         self.score = 0
+        self.opened_cells = 0
+
+    # 최종 걸린 시간 표시하는 함수
+    def get_elapsed_time(self):
+        return int(time.time() - self.start_time)
+    
+    # 최종 점수와 걸린 시간 표시하는 함수
+    def final_message(self):
+        return f"Final Score: {self.score}, Time Taken: {self.get_elapsed_time()} sec"
+
 
 # 지뢰찾기 보드판을 구성하는 클래스        
 class Minesweeper:
@@ -59,7 +81,7 @@ class Minesweeper:
             self.mine_count = 15
             self.screen_width = 500
             self.screen_height = 500
-        else:  # Default to hard if no or invalid input
+        else:
             self.grid_size = 20
             self.mine_count = 40
             self.screen_width = 800
@@ -109,11 +131,14 @@ class Minesweeper:
 
     # 지정된 위치의 칸을 여는 함수
     def open_cell(self, x, y):
-        if not self.grid[x][y]:
-            self.grid[x][y] = 1
-            if self.mines[x][y]:
-                self.game_over = True
-            elif self.adjacent[x][y] == 0:
+    if not self.grid[x][y]:
+        self.grid[x][y] = 1
+        if self.mines[x][y]:
+            self.game_over = True
+            self.scoreboard.apply_game_over_penalty()
+        else:
+            self.scoreboard.update_score_for_open_cell()
+            if self.adjacent[x][y] == 0:
                 self.open_adjacent_cells(x, y)  # 인접한 칸 자동으로 열기
 
     # 지정된 위치의 인접 칸을 자동으로 여는 함수
@@ -140,40 +165,28 @@ class Minesweeper:
                                    self.screen_width // self.grid_size, self.screen_height // self.grid_size)
                 if self.grid[x][y] == 1:
                     if self.mines[x][y]:
-                        pygame.draw.rect(self.screen, (255, 0, 0), rect)  # 지뢰가 있는 칸은 빨간색으로 표시
+                        pygame.draw.rect(self.screen, (255, 0, 0), rect)
                     else:
-                        pygame.draw.rect(self.screen, (255, 255, 255), rect)  # 안전한 칸은 흰색으로 표시
+                        pygame.draw.rect(self.screen, (255, 255, 255), rect)
                         if self.adjacent[x][y] > 0:
                             label = self.font.render(str(self.adjacent[x][y]), True, (0, 0, 0))
-                            self.screen.blit(label, rect.topleft)  # 인접 지뢰 수를 표시
+                            self.screen.blit(label, rect.topleft)
                 else:
-                    pygame.draw.rect(self.screen, (160, 160, 160), rect)  # 닫힌 칸은 회색으로 표시
+                    pygame.draw.rect(self.screen, (160, 160, 160), rect)
                     if self.flags[x][y]:
-                        pygame.draw.circle(self.screen, (0, 0, 255), (rect.centerx, rect.centery), 10)  # 깃발이 있는 칸에는 파란색 원을 표시
-        
-        self.scoreboard.display_score()
+                        pygame.draw.circle(self.screen, (0, 0, 255), (rect.centerx, rect.centery), 10)
     
         if self.game_over:
-            game_over_text = "Game Over!"
-            final_score_text = f"Final Score: {self.scoreboard.score}"
-            game_over_message = self.font.render(game_over_text, True, (255, 0, 0))
-            final_score_message = self.font.render(final_score_text, True, (255, 0, 0))
-            self.screen.blit(game_over_message, (self.screen_width / 2 - game_over_message.get_width() / 2, self.screen_height / 2 - game_over_message.get_height() / 2))
-            self.screen.blit(final_score_message, (self.screen_width / 2 - final_score_message.get_width() / 2, self.screen_height / 2 + game_over_message.get_height() / 2))
-        
+            message = self.font.render("Game Over! " + self.scoreboard.final_message(), True, (255, 0, 0))
+            self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
+    
         if self.victory:
-            victory_text = "You Won!"
-            final_score_text = f"Final Score: {self.scoreboard.score}"
-            victory_message = self.font.render(victory_text, True, (0, 255, 0))
-            final_score_message = self.font.render(final_score_text, True, (0, 255, 0))
-            self.screen.blit(victory_message, (self.screen_width / 2 - victory_message.get_width() / 2, self.screen_height / 2 - victory_message.get_height() / 2))
-            self.screen.blit(final_score_message, (self.screen_width / 2 - final_score_message.get_width() / 2, self.screen_height / 2 + victory_message.get_height() / 2))
-
-
+            message = self.font.render("You Won! " + self.scoreboard.final_message(), True, (0, 255, 0))
+            self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
 
     # 게임 실행 함수
     def run(self):
-        while True:  # 게임을 계속 반복 실행할 수 있도록 무한 루프로 변경
+        while True:
             while not self.game_over and not self.victory:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -185,15 +198,16 @@ class Minesweeper:
                 self.draw_board()
                 pygame.display.flip()
                 self.clock.tick(30)
-    
+        
                 if self.game_over:
                     pygame.time.wait(1000)  # 게임 오버시 1초 대기
                     break
                 if self.victory:
+                    self.scoreboard.apply_victory_bonus(self.current_difficulty)  # 승리시 난이도별 보너스 점수 적용
                     pygame.time.wait(5000)  # 승리시 5초 대기
                     break
     
-            self.reset()  # 게임 상태를 초기화하여 새 게임 시작
+            self.reset()  # 게임판 리셋
 
 if __name__ == "__main__":
     game = Minesweeper()

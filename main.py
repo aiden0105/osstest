@@ -35,13 +35,13 @@ class Score:
             self.score += 200
 
     # 실시간으로 점수, 타이머, 난이도를 표시하는 함수
-    def display_score(self):
-        elapsed_time = int(time.time() - self.start_time)
-        score_time_text = f'{self.difficulty} - Score: {self.score} | Time: {elapsed_time} sec'
-        display_text = self.font.render(score_time_text, True, (0, 0, 255))
-        text_x = (self.screen.get_width() - display_text.get_width()) / 2
-        self.screen.blit(display_text, (text_x, 10))
-
+    class Score:
+        def display_score(self, difficulty):
+            elapsed_time = int(time.time() - self.start_time)
+            score_time_text = f'{difficulty} - Score: {self.score} | Time: {elapsed_time} sec'
+            display_text = self.font.render(score_time_text, True, (0, 0, 255))
+            text_x = (self.screen.get_width() - display_text.get_width()) / 2
+            self.screen.blit(display_text, (text_x, 10))
 
     # 게임 패배시 타이머와 점수 리셋
     def reset(self):
@@ -173,24 +173,26 @@ class Minesweeper:
                                    self.screen_width // self.grid_size, self.screen_height // self.grid_size)
                 if self.grid[x][y] == 1:
                     if self.mines[x][y]:
-                        pygame.draw.rect(self.screen, (255, 0, 0), rect)
+                        pygame.draw.rect(self.screen, (255, 0, 0), rect)  # 지뢰가 있는 칸은 빨간색으로 표시
                     else:
-                        pygame.draw.rect(self.screen, (255, 255, 255), rect)
+                        pygame.draw.rect(self.screen, (255, 255, 255), rect)  # 안전한 칸은 흰색으로 표시
                         if self.adjacent[x][y] > 0:
                             label = self.font.render(str(self.adjacent[x][y]), True, (0, 0, 0))
-                            self.screen.blit(label, rect.topleft)
+                            self.screen.blit(label, rect.topleft)  # 인접 지뢰 수를 표시
                 else:
-                    pygame.draw.rect(self.screen, (160, 160, 160), rect)
+                    pygame.draw.rect(self.screen, (160, 160, 160), rect)  # 닫힌 칸은 회색으로 표시
                     if self.flags[x][y]:
-                        pygame.draw.circle(self.screen, (0, 0, 255), (rect.centerx, rect.centery), 10)
+                        pygame.draw.circle(self.screen, (0, 0, 255), (rect.centerx, rect.centery), 10)  # 깃발이 있는 칸에는 파란색 원을 표시
     
         self.scoreboard.display_score(self.current_difficulty)  # 현재 스코어, 시간, 난이도 실시간 표시
+        
         if self.game_over:
             message = self.font.render("Game Over! " + self.scoreboard.final_message(), True, (255, 0, 0))
             self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
         if self.victory:
             message = self.font.render("You Won! " + self.scoreboard.final_message(), True, (0, 255, 0))
             self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
+
 
     # 게임 실행 함수
     def run(self):

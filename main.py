@@ -1,5 +1,6 @@
 import pygame
 import random
+import time
 
 # 게임 설정: 화면 크기, 격자 크기 및 지뢰 수 설정
 SCREEN_WIDTH = 800
@@ -7,6 +8,27 @@ SCREEN_HEIGHT = 600
 GRID_SIZE = 20
 MINE_COUNT = 40    # 지뢰 총 개수
 
+class Score:
+    def __init__(self, font, screen, initial_score=0):
+        self.score = initial_score
+        self.start_time = time.time()
+        self.font = font
+        self.screen = screen
+
+    def update_score(self, points):
+        self.score += points
+
+    def display_score(self):
+        elapsed_time = int(time.time() - self.start_time)
+        score_text = self.font.render(f'Score: {self.score}', True, (255, 255, 255))
+        time_text = self.font.render(f'Time: {elapsed_time} sec', True, (255, 255, 255))
+        self.screen.blit(score_text, (self.screen.get_width() - 200, 10))
+        self.screen.blit(time_text, (self.screen.get_width() - 200, 50))
+
+    def reset(self):
+        self.start_time = time.time()
+        self.score = 0
+        
 class Minesweeper:
     def __init__(self):
         pygame.init()
@@ -16,11 +38,12 @@ class Minesweeper:
         self.font = pygame.font.Font(None, 36)
         self.choose_difficulty()
         self.reset()
+        self.scoreboard = Score(self.font, self.screen)  # 스코어보드 표시
 
     # 난이도 설정 (easy, medium, hard)
     def choose_difficulty(self):
         print("Choose difficulty: Easy (1), Medium (2), Hard (3)")
-        choice = input("Enter your choice (1, 2, or 3): ")
+        choice = input("Enter your choice (1, 2, 3): ")
         if choice == '1':
             self.grid_size = 8
             self.mine_count = 10
@@ -47,6 +70,7 @@ class Minesweeper:
         self.game_over = False
         self.victory = False
         self.place_mines()
+        self.scoreboard.reset()
 
                         
     # 지뢰를 게임 보드에 무작위로 배치하는 함수
@@ -98,7 +122,10 @@ class Minesweeper:
 
     # 깃발 상태를 토글하는 함수
     def toggle_flag(self, x, y):
-        self.flags[x][y] = not self.flags[x][y]
+        if not self.grid[x][y]:
+            self.flags[x][y] = not self.flags[x][y]
+            self.scoreboard.update_score(-1 if self.flags[x][y] else 1)  # 우클릭 사용시 -1점
+
 
     # 게임 보드 그리기 함수
     def draw_board(self):
@@ -118,13 +145,18 @@ class Minesweeper:
                     pygame.draw.rect(self.screen, (160, 160, 160), rect)  # 닫힌 칸은 회색으로 표시
                     if self.flags[x][y]:
                         pygame.draw.circle(self.screen, (0, 0, 255), (rect.centerx, rect.centery), 10)  # 깃발이 있는 칸에는 파란색 원을 표시
+        
+        self.scoreboard.display_score()
+    
         if self.game_over:
-            message = self.font.render("Game Over! You hit a mine.", True, (255, 0, 0))
-            self.screen.blit(message, (SCREEN_WIDTH / 2 - message.get_width() / 2, SCREEN_HEIGHT / 2))
-
+            message = self.font.render("Game Over! You hit a mine. " + f"Final Score: {self.scoreboard.score}", True, (255, 0, 0))
+            self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
+    
         if self.victory:
-            message = self.font.render("You Won! All safe squares revealed.", True, (0, 255, 0))
-            self.screen.blit(message, (SCREEN_WIDTH / 2 - message.get_width() / 2, SCREEN_HEIGHT / 2))
+            message = self.font.render("You Won! All safe squares revealed. " + f"Final Score: {self.scoreboard.score}", True, (0, 255, 0))
+            self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
+
+
 
     # 게임 실행 함수
     def run(self):

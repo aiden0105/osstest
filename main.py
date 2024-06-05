@@ -65,8 +65,9 @@ class Minesweeper:
         for dx in [-1, 0, 1]:
             for dy in [-1, 0, 1]:
                 nx, ny = x + dx, y + dy
-                if 0 <= nx < GRID_SIZE and 0 <= ny < GRID_SIZE:
+                if 0 <= nx < self.grid_size and 0 <= ny < self.grid_size:
                     self.adjacent[nx][ny] += 1
+
                     
     # 마우스 입력 처리 함수
     def handle_mouse_input(self, event):

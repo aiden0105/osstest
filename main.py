@@ -47,6 +47,7 @@ class Minesweeper:
         self.game_over = False
         self.victory = False
         self.place_mines()
+
                         
     # 지뢰를 게임 보드에 무작위로 배치하는 함수
     def place_mines(self):

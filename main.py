@@ -39,7 +39,7 @@ class Minesweeper:
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Minesweeper")
         self.clock = pygame.time.Clock()
-        self.font = pygame.font.Font(None, 36)
+        self.font = pygame.font.Font(None, 24)
         self.choose_difficulty()
         self.scoreboard = Score(self.font, self.screen)  # 스코어보드 초기화
         self.reset()
@@ -154,12 +154,20 @@ class Minesweeper:
         self.scoreboard.display_score()
     
         if self.game_over:
-            message = self.font.render("Game Over! You hit a mine. " + f"\nFinal Score: {self.scoreboard.score}", True, (255, 0, 0))
-            self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
-    
+            game_over_text = "Game Over!"
+            final_score_text = f"Final Score: {self.scoreboard.score}"
+            game_over_message = self.font.render(game_over_text, True, (255, 0, 0))
+            final_score_message = self.font.render(final_score_text, True, (255, 0, 0))
+            self.screen.blit(game_over_message, (self.screen_width / 2 - game_over_message.get_width() / 2, self.screen_height / 2 - game_over_message.get_height() / 2))
+            self.screen.blit(final_score_message, (self.screen_width / 2 - final_score_message.get_width() / 2, self.screen_height / 2 + game_over_message.get_height() / 2))
+        
         if self.victory:
-            message = self.font.render("You Won! All safe squares revealed. " + f"\nFinal Score: {self.scoreboard.score}", True, (0, 255, 0))
-            self.screen.blit(message, (self.screen_width / 2 - message.get_width() / 2, self.screen_height / 2))
+            victory_text = "You Won!"
+            final_score_text = f"Final Score: {self.scoreboard.score}"
+            victory_message = self.font.render(victory_text, True, (0, 255, 0))
+            final_score_message = self.font.render(final_score_text, True, (0, 255, 0))
+            self.screen.blit(victory_message, (self.screen_width / 2 - victory_message.get_width() / 2, self.screen_height / 2 - victory_message.get_height() / 2))
+            self.screen.blit(final_score_message, (self.screen_width / 2 - final_score_message.get_width() / 2, self.screen_height / 2 + victory_message.get_height() / 2))
 
 
 

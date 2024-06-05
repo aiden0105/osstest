@@ -24,7 +24,6 @@ class Minesweeper:
         self.grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
         self.game_over = False
         self.victory = False
-        self.place_mines()
         self.place_mines()  # 새 게임에 대한 지뢰를 재배치
                         
     # 지뢰를 게임 보드에 무작위로 배치하는 함수
